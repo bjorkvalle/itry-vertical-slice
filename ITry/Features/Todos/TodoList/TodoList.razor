@@ -51,9 +51,9 @@
     private void HandleProgressUpdate()
     {
         if (saveToken != null)
-            ClearTimeout(saveToken);
+            TimeoutHelper.ClearTimeout(saveToken);
 
-        saveToken = SetTimeout(async () =>
+        saveToken = TimeoutHelper.SetTimeout(async () =>
         {
             isLoading = true;
             StateHasChanged();
@@ -62,20 +62,6 @@
             StateHasChanged();
         }, saveTimeout);
     }
-
-    private CancellationTokenSource SetTimeout(Action action, int timeout)
-    {
-        var cts = new CancellationTokenSource();
-        var ct = cts.Token;
-        Task.Delay(timeout).ContinueWith((Task task) =>
-        {
-            if (!ct.IsCancellationRequested)
-                action();
-        }, ct);
-        return cts;
-    }
-
-    private void ClearTimeout(CancellationTokenSource cts) => cts.Cancel();
 
     public IEnumerable<TodoItemModel> ActiveTodos => todos.Where(x => x.IsActive);
     public IEnumerable<TodoItemModel> InActiveTodos => todos.Where(x => !x.IsActive);

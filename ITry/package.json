@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "build:azure": "dotnet build",
-    "buildcss": "tailwindcss -i wwwroot/css/app.css -o wwwroot/css/output.css --minify"
+    "watchcss": "tailwindcss -i wwwroot/css/app.css -o wwwroot/css/app.min.css --watch --minify",
+    "buildcss": "tailwindcss -i wwwroot/css/app.css -o wwwroot/css/app.min.css --minify"
   },
   "devDependencies": {
     "daisyui": "^2.14.1"
