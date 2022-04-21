@@ -1,0 +1,19 @@
+﻿@namespace ITry.Features
+
+<div class="flex h-16 items-center gap-2 pt-4 pb-2 px-1 @JustifyClass">
+    @ChildContent
+</div>
+
+@code {
+    [Parameter] public RenderFragment ChildContent { get; set; }
+    [Parameter] public Justify Justify { get; set; }
+
+    public string JustifyClass => Justify switch
+    {
+        Justify.Start => "justify-start",
+        Justify.Between => "justify-between",
+        Justify.End => "justify-end",
+       _ => throw new ArgumentException(message: "invalid enum value", paramName: nameof(Justify)),
+    };
+}
+<div class="hidden justify-start justify-between justify-end"></div>

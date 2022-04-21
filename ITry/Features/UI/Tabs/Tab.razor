@@ -1,0 +1,23 @@
+﻿@namespace ITry.Features
+
+<div class="tab @ActiveClass" @onclick="SetSelected">
+    @ChildContent
+</div>
+
+@code {
+    [CascadingParameter] TabContainer TabContainer { get; set; }
+    [Parameter] public RenderFragment ChildContent { get; set; }
+    [Parameter] public string Name { get; set; }
+
+    protected override void OnInitialized()
+    {
+        if (TabContainer == null)
+            throw new ArgumentNullException(nameof(TabContainer), $"Tab must exist within a Tab Container (${nameof(TabContainer)})");
+    }
+
+    private void SetSelected() => TabContainer.SetSelected(Name);
+
+    public string ActiveClass => IsActive ? "tab-active" : null;
+    public bool IsActive => TabContainer.IsSelected(Name);
+}
+<div class="hidden tab-active"></div>

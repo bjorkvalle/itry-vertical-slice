@@ -11,6 +11,7 @@ namespace ITry.Application
         {
             CreateMap<Todo, TodoDto>();
             CreateMap<Todo, TodoItemModel>();
+            CreateMap<Todo, TodoFormModel>();
             CreateMap<TodoWeek, TodoWeekModel>();
             CreateMap<TodoDay, TodoDayModel>().ReverseMap();
             //CreateMap<User, UserResource>().ReverseMap();

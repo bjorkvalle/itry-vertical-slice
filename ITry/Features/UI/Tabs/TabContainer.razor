@@ -1,0 +1,35 @@
+﻿@namespace ITry.Features
+
+<CascadingValue Value="this">
+    <div class="tabs tabs-boxed">
+        @Items
+    </div>
+    @Content
+</CascadingValue>
+
+@code {
+    [Parameter] public string DefaultTab { get; set; }
+    [Parameter] public RenderFragment Items { get; set; }
+    [Parameter] public RenderFragment Content { get; set; }
+
+    private string selected;
+
+    protected override void OnInitialized()
+    {
+        selected = DefaultTab;
+    }
+
+    public bool IsSelected(string tab) => tab.Equals(selected);
+
+    public void SetSelected(string title)
+    {
+
+        if (selected == title)
+            return;
+
+        selected = title;
+        StateHasChanged();
+    }
+
+    public string SelectedTab => selected;
+}

@@ -1,0 +1,14 @@
+﻿@namespace ITry.Features
+
+<div class="@ActiveClass">
+    @ChildContent
+</div>
+
+@code {
+    [CascadingParameter] TabContainer TabContainer { get; set; }
+    [Parameter] public RenderFragment ChildContent { get; set; }
+    [Parameter] public string Name { get; set; }
+
+    public string ActiveClass => TabContainer.IsSelected(Name) ? "block" : "hidden";
+}
+<div class="hidden block"></div>
