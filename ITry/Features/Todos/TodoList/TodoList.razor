@@ -1,0 +1,83 @@
+﻿@namespace ITry.Features
+@inject IMediator Mediator
+@inject IJSRuntime JSRuntime
+
+<div class="w-full md:w-96 mx-auto px-4">
+    <div class="flex justify-end items-center gap-2 pt-4 pb-2">
+        <div class="form-control">
+            <label class="label cursor-pointer justify-start gap-2">
+                <span class="label-text">Show archived</span>
+                <input type="checkbox" class="toggle toggle-sm" checked="@showInactive" @onchange="ToggleInactive">
+            </label>
+        </div>
+        <div class="tooltip tooltip-left" data-tip="@SavingTooltip">
+            <Saving IsLoading="isLoading" />
+        </div>
+    </div>
+    <div class="flex flex-col gap-3 items-center justify-center">
+        <Loop Items="ActiveTodos" TItem="TodoItemModel" Context="item">
+            <TodoItem Model="item" OnUpdate="HandleProgressUpdate" />
+        </Loop>
+    </div>
+    @if (showInactive)
+    {
+        <div class="divider"></div>
+        <div class="flex flex-col gap-3 items-center justify-center">
+            <Loop Items="InActiveTodos" TItem="TodoItemModel" Context="item">
+                <TodoItem Model="item" />
+            </Loop>
+        </div>
+    }
+</div>
+
+@code {
+    private IEnumerable<TodoItemModel> todos;
+    private bool showInactive, isLoading;
+    private CancellationTokenSource saveToken;
+    private int saveTimeout = 1000;
+
+    protected async override Task OnInitializedAsync()
+    {
+        todos = await Mediator.Send(new GetTodoItemsQuery());
+        showInactive = (await JSRuntime.InvokeAsync<string>(JSHelper.Functions.GetStoredItem, nameof(showInactive)))?.Equals("true") ?? false;
+    }
+
+    private async Task ToggleInactive()
+    {
+        showInactive = !showInactive;
+        await JSRuntime.InvokeVoidAsync(JSHelper.Functions.StoreItem, nameof(showInactive), showInactive);
+    }
+
+    private void HandleProgressUpdate()
+    {
+        if (saveToken != null)
+            ClearTimeout(saveToken);
+
+        saveToken = SetTimeout(async () =>
+        {
+            isLoading = true;
+            StateHasChanged();
+            await Mediator.Send(new UpdateProgressCommand(todos));
+            isLoading = false;
+            StateHasChanged();
+        }, saveTimeout);
+    }
+
+    private CancellationTokenSource SetTimeout(Action action, int timeout)
+    {
+        var cts = new CancellationTokenSource();
+        var ct = cts.Token;
+        Task.Delay(timeout).ContinueWith((Task task) =>
+        {
+            if (!ct.IsCancellationRequested)
+                action();
+        }, ct);
+        return cts;
+    }
+
+    private void ClearTimeout(CancellationTokenSource cts) => cts.Cancel();
+
+    public IEnumerable<TodoItemModel> ActiveTodos => todos.Where(x => x.IsActive);
+    public IEnumerable<TodoItemModel> InActiveTodos => todos.Where(x => !x.IsActive);
+    public string SavingTooltip => isLoading ? "Saving" : "Saved";
+}

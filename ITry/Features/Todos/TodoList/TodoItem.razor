@@ -1,0 +1,59 @@
+﻿@namespace ITry.Features
+
+<div class="card w-full bg-base-100 @CardClass">
+    <div class="card-body gap-4 items-center text-center">
+        <div class="card-actions justify-center w-full">
+            <a class="btn w-full shadow @NavLinkClass" href="@EditHref">@Model.Title</a>
+        </div>
+        @if (Model.IsActive)
+        {
+            <progress class="progress w-full @ProgressClass(Model)" value="@Model.Completed" max="@Model.Target"></progress>
+            <div class="flex justify-between w-full">
+                <Loop Items="Model.CurrentWeek.TodoDays" TItem="TodoDayModel" Context="todoDay">
+                    <button class="btn btn-sm btn-circle shadow btn-neutral @DayButtonClass(todoDay)"
+                        disabled="@(!todoDay.IsActive)"
+                        @onclick="(() => UpdateTodo(todoDay))">
+                        @todoDay.Day.GetDescription()
+                    </button>
+                </Loop>
+            </div>
+        }
+    </div>
+</div>
+<div class="hidden btn-primary opacity-50 shadow-lg progress-warning progress-success"></div>
+
+@code {
+    [Parameter] public EventCallback OnUpdate { get; set; }
+    [Parameter] public TodoItemModel Model { get; set; }
+
+    private IEnumerable<WeekDays> days = Enum.GetValues(typeof(WeekDays)).Cast<WeekDays>();
+
+    private async Task UpdateTodo(TodoDayModel day)
+    {
+        UpdateTodoDayState(day);
+        await OnUpdate.InvokeAsync();
+    }
+
+    private void UpdateTodoDayState(TodoDayModel day) => day.State = day.State switch
+    {
+        DayState.Neutral => DayState.Success,
+        DayState.Success => DayState.Fail,
+        DayState.Fail => DayState.Success,
+        _ => throw new ArgumentException(message: "invalid enum index value", paramName: nameof(day)),
+    };
+
+    private string DayButtonClass(TodoDayModel day) => day.FormattedState switch
+    {
+        DayState.Neutral => "btn-neutral",
+        DayState.Success => "btn-success",
+        DayState.Fail => "btn-error",
+        DayState.Warning => "btn-warning",
+        _ => throw new ArgumentException(message: "invalid enum index value", paramName: nameof(day)),
+    };
+
+    private string ProgressClass(TodoItemModel todo) => todo.Completed >= todo.Target ? "progress-success" : "progress-warning";
+
+    public string EditHref => $"edit/{Model.Id}";
+    public string CardClass => Model.IsActive ? "shadow-lg" : "shadow";
+    public string NavLinkClass => Model.IsActive ? "btn-primary" : "btn-neutral opacity-50";
+}
