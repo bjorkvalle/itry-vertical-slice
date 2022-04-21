@@ -1,7 +1,6 @@
 {
   "name": "itry-vertical-slice",
   "version": "1.0.0",
-  "lockfileVersion": 2,
   "scripts": {
     "build:azure": "dotnet build",
     "buildcss": "tailwindcss -i wwwroot/css/app.css -o wwwroot/css/output.css --minify"
