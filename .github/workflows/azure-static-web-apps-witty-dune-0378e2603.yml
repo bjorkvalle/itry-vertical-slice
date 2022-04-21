@@ -19,7 +19,7 @@ jobs:
         with:
           submodules: true
       - name: Install npm dependencies
-        run: npm i daisyui
+        run: npm install
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
