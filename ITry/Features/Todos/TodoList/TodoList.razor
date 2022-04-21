@@ -1,32 +1,14 @@
 ﻿@namespace ITry.Features
 @inject IMediator Mediator
-@inject IJSRuntime JSRuntime
 
-<Toolbar Justify="Justify.End">
-    @*<NavLink class="btn btn-primary btn-square btn-xs" href="details">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
-        </svg>
-        </NavLink>*@
-    <div class="flex items-center gap-2">
-        <div class="form-control">
-            <label class="label cursor-pointer justify-start gap-2">
-                <span class="label-text">Show archived</span>
-                <input type="checkbox" class="toggle toggle-sm" checked="@showInactive" @onchange="ToggleInactive">
-            </label>
-        </div>
-        <div class="tooltip tooltip-left" data-tip="@SavingTooltip">
-            <Saving IsLoading="isLoading" />
-        </div>
-    </div>
-</Toolbar>
+
 <div class="flex flex-col gap-3 items-center justify-center">
     <Loop Items="ActiveTodos" TItem="TodoItemModel" Context="item">
         <TodoItem Model="item" OnUpdate="HandleProgressUpdate" />
     </Loop>
 </div>
 
-@if (showInactive)
+@if (ShowInactive)
 {
     <div class="divider"></div>
     <div class="flex flex-col gap-3 items-center justify-center">
@@ -37,21 +19,16 @@
 }
 
 @code {
+    [Parameter] public bool ShowInactive { get; set; }
+    [Parameter] public EventCallback<bool> OnSaving { get; set; }
+
     private IEnumerable<TodoItemModel> todos;
-    private bool showInactive, isLoading;
     private CancellationTokenSource saveToken;
     private int saveTimeout = 1000;
 
     protected async override Task OnInitializedAsync()
     {
         todos = await Mediator.Send(new GetTodoItemsQuery());
-        showInactive = (await JSRuntime.InvokeAsync<string>(JSHelper.Functions.GetStoredItem, nameof(showInactive)))?.Equals("true") ?? false;
-    }
-
-    private async Task ToggleInactive()
-    {
-        showInactive = !showInactive;
-        await JSRuntime.InvokeVoidAsync(JSHelper.Functions.StoreItem, nameof(showInactive), showInactive);
     }
 
     private void HandleProgressUpdate()
@@ -61,15 +38,13 @@
 
         saveToken = TimeoutHelper.SetTimeout(async () =>
         {
-            isLoading = true;
-            StateHasChanged();
+            await OnSaving.InvokeAsync(true);
             await Mediator.Send(new UpdateProgressCommand(todos));
-            isLoading = false;
-            StateHasChanged();
+            await OnSaving.InvokeAsync(false);
         }, saveTimeout);
     }
 
     public IEnumerable<TodoItemModel> ActiveTodos => todos.Where(x => x.IsActive);
     public IEnumerable<TodoItemModel> InActiveTodos => todos.Where(x => !x.IsActive);
-    public string SavingTooltip => isLoading ? "Saving" : "Saved";
+    
 }

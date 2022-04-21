@@ -53,7 +53,7 @@
 
     private string ProgressClass(TodoItemModel todo) => todo.Completed >= todo.Target ? "progress-success" : "progress-warning";
 
-    public string EditHref => $"details/{Model.Id}";
+    public string EditHref => $"update/{Model.Id}";
     public string CardClass => Model.IsActive ? "shadow-lg" : "shadow";
     public string NavLinkClass => Model.IsActive ? "btn-primary" : "btn-neutral opacity-50";
 }

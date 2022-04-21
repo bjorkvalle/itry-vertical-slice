@@ -1,0 +1,51 @@
+﻿@page "/update/{id:int}"
+
+<PageTitle>@TabTitle</PageTitle>
+
+<Toolbar Justify="Justify.Between">
+    <NavLink href="/">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-neutral" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+        </svg>
+    </NavLink>
+    <div class="flex items-center gap-2">
+        <Saving IsLoading="isLoading" />
+    </div>
+</Toolbar>
+
+<TabContainer DefaultTab="a">
+    <Items>
+        <Tab Name="a">Edit</Tab>
+        <Tab Name="c">Progress</Tab>
+        <Tab Name="b">History</Tab>
+    </Items>
+    <Content>
+        <TabPanel Name="a">
+            <h3 class="text-lg">TodoForm - @Id</h3>
+            <TodoForm ModelId="Id" OnIsEdit="HandleEditMode" />
+        </TabPanel>
+        <TabPanel Name="b">
+            <h3 class="text-lg">B</h3>
+        </TabPanel>
+        <TabPanel Name="c">
+            <h3 class="text-lg">C</h3>
+        </TabPanel>
+        @*<TabPanel Name="@ResultIndexTabs.Overview.ToString()">*@
+    </Content>
+    @*<Tab Name="@item.ToString()">@item.GetDescription()</Tab>*@
+</TabContainer>
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private string modelTitle;
+    private bool isLoading;
+
+    private void HandleEditMode(string title)
+    {
+        modelTitle = title;
+    }
+
+    // create notification event instead to try it out?
+    public string TabTitle => !string.IsNullOrEmpty(modelTitle) ? $"ITry - {modelTitle}" : "ITry";
+}

@@ -1,38 +1,8 @@
 ﻿@namespace ITry.Features
 @inject IMediator Mediator
 
-<Toolbar Justify="Justify.Between">
-    <NavLink href="/">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-neutral" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
-        </svg>
-    </NavLink>
-    <div class="flex items-center gap-2 @CreateClass">
-        <Saving IsLoading="isLoading" />
-    </div>
-</Toolbar>
 
-<TabContainer DefaultTab="a">
-    <Items>
-        <Tab Name="a">Edit</Tab>
-        <Tab Name="c">Progress</Tab>
-        <Tab Name="b">History</Tab>
-    </Items>
-    <Content>
-        <TabPanel Name="a">
-            <h3 class="text-lg">TodoForm - @ModelId</h3>
-        </TabPanel>
-        <TabPanel Name="b">
-            <h3 class="text-lg">B</h3>
-        </TabPanel>
-        <TabPanel Name="c">
-            <h3 class="text-lg">C</h3>
-        </TabPanel>
-        @*<TabPanel Name="@ResultIndexTabs.Overview.ToString()">*@
-    </Content>
-    @*<Tab Name="@item.ToString()">@item.GetDescription()</Tab>*@
-</TabContainer>
-
+<div>Form!</div>
 
 @code {
     [Parameter] public int ModelId { get; set; }
@@ -46,7 +16,4 @@
         model = await Mediator.Send(new GetTodoFormQuery(ModelId));
         await OnIsEdit.InvokeAsync(model?.Title);
     }
-
-    public string CreateClass => model == null ? "invisible" : null;
 }
-<div class="hidden invisible"></div>

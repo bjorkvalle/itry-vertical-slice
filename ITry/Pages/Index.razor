@@ -1,13 +1,47 @@
 ﻿@page "/"
+@inject IJSRuntime JSRuntime
 
 <PageTitle>ITry</PageTitle>
 
-<div class="relative h-screen">
-    <TodoList />
+<div class="relative h-[calc(100vh-4rem)]">
+    <Toolbar Justify="Justify.End">
+        <div class="flex items-center gap-2">
+            <div class="form-control">
+                <label class="label cursor-pointer justify-start gap-2">
+                    <span class="label-text">Show archived</span>
+                    <input type="checkbox" class="toggle toggle-sm" checked="@showInactive" @onchange="ToggleInactive">
+                </label>
+            </div>
+            <div class="tooltip tooltip-left" data-tip="@SavingTooltip">
+                <Saving IsLoading="isLoading" />
+            </div>
+        </div>
+    </Toolbar>
 
-    <NavLink class="btn btn-primary btn-circle absolute right-0 bottom-0 mb-5" href="details">
+    <TodoList ShowInactive="showInactive" OnSaving="ToggleLoading" />
+
+    <NavLink class="btn btn-primary btn-circle absolute right-0 bottom-0 mb-5 mr-3 shadow-lg" href="create">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
         </svg>
     </NavLink>
 </div>
+
+@code {
+    private bool showInactive, isLoading;
+
+    protected async override Task OnInitializedAsync()
+    {
+        showInactive = (await JSRuntime.InvokeAsync<string>(JSHelper.Functions.GetStoredItem, nameof(showInactive)))?.Equals("true") ?? false;
+    }
+
+    private async Task ToggleInactive()
+    {
+        showInactive = !showInactive;
+        await JSRuntime.InvokeVoidAsync(JSHelper.Functions.StoreItem, nameof(showInactive), showInactive);
+    }
+
+    private void ToggleLoading(bool newValue) => isLoading = newValue;
+
+    public string SavingTooltip => isLoading ? "Saving" : "Saved";
+}
