@@ -398,4 +398,4 @@ FodyWeavers.xsd
 *.sln.iml
 
 # github workflow issues
-/ITry/package-lock.json
+/ITry/package.json
