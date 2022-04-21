@@ -18,6 +18,8 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: true
+      - name: Install npm dependencies
+        run: npm install tailwindcss
       - name: Minify css
         run: npx tailwindcss -i ./wwwroot/css/app.css -o ./wwwroot/css/output.css --minify
       - name: Build And Deploy
